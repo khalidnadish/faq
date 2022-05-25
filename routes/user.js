@@ -1,13 +1,38 @@
 import express from "express";
- 
+import multer from "multer";
+import dataBase from "../controller/database.js";
+import cookieParser from "cookie-Parser";
 
- 
-import { newRow, getAll ,row1000} from "../controller/faqControl.js";
+import {
+  newUser,
+  getAlluser,
+  createUser,
+  loginUser,
+  avatarUpload,
+} from "../controller/userControl.js";
 
 const router = express.Router();
+// app.use("../images", express.static("uploads"));
 
-router.post("/", newRow);
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    console.log(file);
+    console.log(file.path);
 
+    cb(null, "./images/avatar/");
+  },
+  filename: (req, file, cb) => {
+    console.log(file);
+    cb(null, Date.now() + "_" + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+router.post("/", createUser);
+router.post("/login", loginUser);
+
+router.post("/upload/:userId", upload.single("avatar"), avatarUpload);
 // router.get("/getall",(err,data)=>{
 //  if(err){
 //      console.log(err)
@@ -17,8 +42,7 @@ router.post("/", newRow);
 
 // });
 
-
-router.get("/",getAll);   
-router.post("/1000",row1000);  
+router.get("/", getAlluser);
+// router.post("/1000", newUser);
 
 export default router;
